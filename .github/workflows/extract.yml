@@ -1,27 +1,70 @@
-name: Extract Boot Image
+name: Build APK
 
 on:
-  workflow_dispatch:
+  push:
+    branches: [ main ]
 
 jobs:
-  extract:
+  build:
     runs-on: ubuntu-latest
-
+    
     steps:
-      - name: Installing tools
-        run: sudo apt update && sudo apt install -y tar wget
-
-      - name: Downloading ROM
-        run: wget -O rom.tgz "https://bn.d.miui.com/V14.0.8.0.TKUINXM/selene_in_global_images_V14.0.8.0.TKUINXM_20240424.0000.00_13.0_in_a3773ba52e.tgz"
-
-      - name: Extracting ROM
-        run: |
-          tar -xvf rom.tgz
-          cd */images
-          ls
-
-      - name: Uploading boot.img
-        uses: actions/upload-artifact@v4
-        with:
-          name: boot-image
-          path: "**/images/boot.img"
+    - uses: actions/checkout@v3
+    
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+    
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y \
+          python3-pip \
+          build-essential \
+          git \
+          zlib1g-dev \
+          libncurses5-dev \
+          libgdbm-dev \
+          libnss3-dev \
+          libssl-dev \
+          libreadline-dev \
+          libffi-dev \
+          libsqlite3-dev \
+          wget \
+          libbz2-dev \
+          openjdk-17-jdk \
+          unzip
+          
+    - name: Install python-for-android
+      run: |
+        pip install python-for-android
+        
+    - name: Setup Android SDK/NDK
+      run: |
+        wget https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip
+        unzip commandlinetools-linux-9477386_latest.zip -d $HOME/android-sdk/cmdline-tools
+        mv $HOME/android-sdk/cmdline-tools/cmdline-tools $HOME/android-sdk/cmdline-tools/latest
+        echo "y" | $HOME/android-sdk/cmdline-tools/latest/bin/sdkmanager "platforms;android-33" "build-tools;33.0.0" "ndk;25.2.9519653"
+        
+    - name: Build APK
+      env:
+        ANDROID_SDK_ROOT: $HOME/android-sdk
+        ANDROID_NDK_HOME: $HOME/android-sdk/ndk/25.2.9519653
+      run: |
+        p4a apk --private . \
+          --package=com.ShadowBridge \
+          --name="Shadow" \
+          --version=1.0 \
+          --bootstrap=sdl2 \
+          --requirements=python3,kivy \
+          --service=MyService:service/main.py:foreground \
+          --android-api=30 \
+          --min-sdk-version=21 \
+          --ndk-version=25.2.9519653
+          
+    - name: Upload APK
+      uses: actions/upload-artifact@v3
+      with:
+        name: myapp-debug
+        path: "*.apk"
