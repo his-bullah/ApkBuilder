@@ -38,11 +38,14 @@ jobs:
           autoconf \
           libtool \
           pkg-config \
-          cmake
+          cmake \
+          automake \
+          m4 \
+          libtool-bin
 
     - name: Install python-for-android
       run: |
-        pip install python-for-android cython
+        pip install python-for-android cython==0.29.33
 
     - name: Setup Android SDK
       run: |
