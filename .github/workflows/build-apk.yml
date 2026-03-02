@@ -65,7 +65,7 @@ jobs:
           "tools"
 
         mkdir -p /home/runner/android-sdk/tools/bin
-        ln -s /home/runner/android-sdk/cmdline-tools/latest/bin/sdkmanager \
+        ln -sf /home/runner/android-sdk/cmdline-tools/latest/bin/sdkmanager \
               /home/runner/android-sdk/tools/bin/sdkmanager
 
     - name: Create buildozer.spec
