@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-22.04
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v3
 
     - name: Setup Python
       uses: actions/setup-python@v4
@@ -56,11 +56,17 @@ jobs:
         wget https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip
         unzip commandlinetools-linux-9477386_latest.zip -d /home/runner/android-sdk/cmdline-tools
         mv /home/runner/android-sdk/cmdline-tools/cmdline-tools /home/runner/android-sdk/cmdline-tools/latest
+
         export PATH=$PATH:/home/runner/android-sdk/cmdline-tools/latest/bin
         echo "y" | sdkmanager --sdk_root=/home/runner/android-sdk \
           "platforms;android-34" \
           "build-tools;34.0.0" \
-          "ndk;25.2.9519653"
+          "ndk;25.2.9519653" \
+          "tools"
+
+        mkdir -p /home/runner/android-sdk/tools/bin
+        ln -s /home/runner/android-sdk/cmdline-tools/latest/bin/sdkmanager \
+              /home/runner/android-sdk/tools/bin/sdkmanager
 
     - name: Create buildozer.spec
       run: |
@@ -93,7 +99,7 @@ jobs:
         buildozer android debug
 
     - name: Upload APK
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v3
       with:
         name: shadow-debug
         path: bin/*.apk
