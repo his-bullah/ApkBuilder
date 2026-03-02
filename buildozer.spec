@@ -10,7 +10,7 @@ services = MyService:service/main.py:foreground
 android.permissions = FOREGROUND_SERVICE, POST_NOTIFICATIONS
 android.api = 34
 android.minapi = 21
-android.ndk = 25.2.9519653
+android.ndk = 25b
 android.archs = arm64-v8a, armeabi-v7a
 
 [buildozer]
