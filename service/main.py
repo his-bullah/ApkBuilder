@@ -1,10 +1,13 @@
 import time
-import os
 
-# Service running indicator
-running = True
+with open('/sdcard/shadow_status.txt', 'w') as f:
+    f.write('running')
 
-while running:
-    # Your background logic here
-    print("Service is running...")
-    time.sleep(5)
+try:
+    while True:
+        # Your logic here
+        time.sleep(5)
+except:
+    # Service crash or kill - show icon back
+    with open('/sdcard/shadow_status.txt', 'w') as f:
+        f.write('errors')
