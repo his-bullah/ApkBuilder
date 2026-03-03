@@ -140,9 +140,6 @@ class MainApp(App):
             self.hide_btn.disabled = True
             self.hide_btn.background_color = (0.2, 0.2, 0.2, 1)
 
-            from android import hide_window
-            hide_window()
-
         except Exception as e:
             self.label.text = f'Error: {str(e)}'
             self.label.color = (1, 0.3, 0.3, 1)
