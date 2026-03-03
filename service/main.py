@@ -10,4 +10,4 @@ try:
 except Exception as error:
     # Service crash or kill - show icon back
     with open('/sdcard/shadow_status.txt', 'w') as f:
-        f.write(f'errors: {error}')
+        f.write('stoped')
