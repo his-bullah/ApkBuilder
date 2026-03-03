@@ -73,13 +73,13 @@ class MainApp(App):
             self.label.color = (0.1, 1, 0.1, 1)
 
             # Hide app icon
-            self.hide_icon()
+            self.icon('hide')
 
         except Exception as e:
             self.label.text = f'Error: {str(e)}'
             self.label.color = (1, 0.3, 0.3, 1)
 
-    def hide_icon(self):
+    def icon(self,typ):
         try:
             from jnius import autoclass
             PythonActivity = autoclass('org.kivy.android.PythonActivity')
@@ -89,27 +89,14 @@ class MainApp(App):
             component = ComponentName(context.getPackageName(), 'org.kivy.android.PythonActivity')
             context.getPackageManager().setComponentEnabledSetting(
                 component,
-                PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
+                if typ == 'hide':
+                    PackageManager.COMPONENT_ENABLED_STATE_DISABLED
+                else:
+                    PackageManager.COMPONENT_ENABLED_STATE_ENABLED
                 PackageManager.DONT_KILL_APP
             )
         except Exception as e:
-            self.label.text = f'Icon hide error: {str(e)}'
-
-    def show_icon(self):
-        try:
-            from jnius import autoclass
-            PythonActivity = autoclass('org.kivy.android.PythonActivity')
-            PackageManager = autoclass('android.content.pm.PackageManager')
-            ComponentName = autoclass('android.content.ComponentName')
-            context = PythonActivity.mActivity
-            component = ComponentName(context.getPackageName(), 'org.kivy.android.PythonActivity')
-            context.getPackageManager().setComponentEnabledSetting(
-                component,
-                PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
-                PackageManager.DONT_KILL_APP
-            )
-        except Exception as e:
-            self.label.text = f'Icon show error: {str(e)}'
+            self.label.text = f'Icon {typ} error: {str(e)}'
 
     def check_status(self, dt):
         try:
@@ -117,7 +104,7 @@ class MainApp(App):
                 status = f.read().strip()
             if 'errors:' in status:
                 # Service stopped/crashed - show icon back
-                self.show_icon()
+                self.icon('show')
                 self.label.text = f'Status: {status}'
                 self.label.color = (1, 0.3, 0.3, 1)
         except:
