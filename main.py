@@ -33,8 +33,7 @@ class MainApp(App):
     def launch(self, dt):
         try:
             from android import AndroidService
-            self.service = AndroidService('Shadow', 'Shadow is running...')
-            self.service.start('start')
+            AndroidService('Shadow','Shadow is running...').start('Yaaaaay its work')
             self.label.text = 'Service Running'
         except Exception as e:
             self.label.text = f'Error: {str(e)}'
