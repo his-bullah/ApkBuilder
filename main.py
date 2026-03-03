@@ -119,13 +119,11 @@ class MainApp(App):
         try:
             with open('/sdcard/shadow_status.txt', 'r') as f:
                 status = f.read().strip()
-            if status == 'stopped':
+            if 'errors:' in status:
                 # Service stopped/crashed - show icon back
                 self.show_icon()
-                self.label.text = 'Status: Stopped'
+                self.label.text = f'Status: {status}'
                 self.label.color = (1, 0.3, 0.3, 1)
-                self.launch_btn.disabled = False
-                self.launch_btn.background_color = (0.1, 0.6, 0.1, 1)
         except:
             pass
 
