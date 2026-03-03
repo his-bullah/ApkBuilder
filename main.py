@@ -6,12 +6,9 @@ from kivy.clock import Clock
 class MainApp(App):
     def build(self):
         root = BoxLayout(orientation='vertical', padding=20)
-
         self.label = Label(text='Starting...')
         root.add_widget(self.label)
-
         Clock.schedule_once(self.get_permission, 1)
-
         return root
 
     def get_permission(self, dt):
