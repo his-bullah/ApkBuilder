@@ -75,10 +75,6 @@ class MainApp(App):
             # Hide app icon
             self.hide_icon()
 
-            # Minimize app
-            from android import hide_window
-            hide_window()
-
         except Exception as e:
             self.label.text = f'Error: {str(e)}'
             self.label.color = (1, 0.3, 0.3, 1)
