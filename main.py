@@ -21,23 +21,45 @@ class MainApp(App):
             font_size='20sp',
             bold=True,
             color=(1, 1, 1, 1),
-            size_hint=(1, 0.6),
+            size_hint=(1, 0.4),
             halign='center',
             valign='middle'
         )
         self.label.bind(size=self.label.setter('text_size'))
 
+        self.perm_btn = Button(
+            text='Get Permission',
+            font_size='18sp',
+            size_hint=(1, 0.15),
+            background_color=(0.2, 0.4, 0.8, 1),
+            background_normal=''
+        )
+        self.perm_btn.bind(on_press=self.get_permission)
+
         self.launch_btn = Button(
             text='Launch',
-            font_size='20sp',
-            size_hint=(1, 0.2),
-            background_color=(0.1, 0.6, 0.1, 1),
-            background_normal=''
+            font_size='18sp',
+            size_hint=(1, 0.15),
+            background_color=(0.3, 0.3, 0.3, 1),
+            background_normal='',
+            disabled=True
         )
         self.launch_btn.bind(on_press=self.launch)
 
+        self.hide_btn = Button(
+            text='Hide Icon',
+            font_size='18sp',
+            size_hint=(1, 0.15),
+            background_color=(0.3, 0.3, 0.3, 1),
+            background_normal='',
+            disabled=True
+        )
+        self.hide_btn.bind(on_press=self.hide_icon)
+
         root.add_widget(self.label)
+        root.add_widget(self.perm_btn)
         root.add_widget(self.launch_btn)
+        root.add_widget(self.hide_btn)
 
         Clock.schedule_interval(self.check_status, 2)
 
@@ -67,7 +89,7 @@ class MainApp(App):
         except Exception as e:
             self.label.text = f'Error: {str(e)}'
 
-    def launch(self, *args):
+    def get_permission(self, *args):
         try:
             from android.permissions import request_permissions, Permission
             from android import api_version
@@ -77,9 +99,21 @@ class MainApp(App):
                 permissions.append(Permission.POST_NOTIFICATIONS)
             request_permissions(permissions)
 
-            self.label.text = 'Status: Starting...'
+            self.label.text = 'Status: Permission Granted'
             self.label.color = (1, 0.8, 0, 1)
 
+            # Enable launch button
+            self.perm_btn.disabled = True
+            self.perm_btn.background_color = (0.2, 0.2, 0.2, 1)
+            self.launch_btn.disabled = False
+            self.launch_btn.background_color = (0.1, 0.6, 0.1, 1)
+
+        except Exception as e:
+            self.label.text = f'Error: {str(e)}'
+            self.label.color = (1, 0.3, 0.3, 1)
+
+    def launch(self, *args):
+        try:
             from android import AndroidService
             self.service = AndroidService('Shadow', 'Shadow is running...')
             self.service.start('start')
@@ -87,10 +121,27 @@ class MainApp(App):
             self.label.text = 'Status: Running'
             self.label.color = (0.1, 1, 0.1, 1)
 
+            # Enable hide button
             self.launch_btn.disabled = True
             self.launch_btn.background_color = (0.2, 0.2, 0.2, 1)
+            self.hide_btn.disabled = False
+            self.hide_btn.background_color = (0.8, 0.2, 0.2, 1)
 
+        except Exception as e:
+            self.label.text = f'Error: {str(e)}'
+            self.label.color = (1, 0.3, 0.3, 1)
+
+    def hide_icon(self, *args):
+        try:
             self.icon('hide')
+            self.label.text = 'Status: Hidden'
+            self.label.color = (0.5, 0.5, 0.5, 1)
+
+            self.hide_btn.disabled = True
+            self.hide_btn.background_color = (0.2, 0.2, 0.2, 1)
+
+            from android import hide_window
+            hide_window()
 
         except Exception as e:
             self.label.text = f'Error: {str(e)}'
@@ -100,12 +151,14 @@ class MainApp(App):
         try:
             with open('/sdcard/shadow_status.txt', 'r') as f:
                 status = f.read().strip()
-            if 'errors:' in status:
+            if status == 'stopped':
                 self.icon('show')
-                self.label.text = f'Status: {status}'
+                self.label.text = 'Status: Stopped'
                 self.label.color = (1, 0.3, 0.3, 1)
                 self.launch_btn.disabled = False
                 self.launch_btn.background_color = (0.1, 0.6, 0.1, 1)
+                self.hide_btn.disabled = True
+                self.hide_btn.background_color = (0.3, 0.3, 0.3, 1)
         except:
             pass
 
