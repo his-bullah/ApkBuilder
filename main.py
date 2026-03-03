@@ -5,18 +5,9 @@ from kivy.clock import Clock
 
 class MainApp(App):
     def build(self):
-        self.service = None
-
         root = BoxLayout(orientation='vertical', padding=20)
 
-        self.label = Label(
-            text='Starting...',
-            font_size='18sp',
-            halign='center',
-            valign='middle'
-        )
-        self.label.bind(size=self.label.setter('text_size'))
-
+        self.label = Label(text='Starting...')
         root.add_widget(self.label)
 
         Clock.schedule_once(self.get_permission, 1)
