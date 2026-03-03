@@ -16,7 +16,6 @@ class MainApp(App):
             self.rect = Rectangle(size=root.size, pos=root.pos)
         root.bind(size=self._update_rect, pos=self._update_rect)
 
-        # One label - all updates here
         self.label = Label(
             text='Status: Ready',
             font_size='20sp',
@@ -28,7 +27,6 @@ class MainApp(App):
         )
         self.label.bind(size=self.label.setter('text_size'))
 
-        # Launch button only
         self.launch_btn = Button(
             text='Launch',
             font_size='20sp',
@@ -41,7 +39,6 @@ class MainApp(App):
         root.add_widget(self.label)
         root.add_widget(self.launch_btn)
 
-        # Check status every 2 sec
         Clock.schedule_interval(self.check_status, 2)
 
         return root
@@ -50,9 +47,28 @@ class MainApp(App):
         self.rect.pos = instance.pos
         self.rect.size = instance.size
 
+    def icon(self, action):
+        try:
+            from jnius import autoclass
+            PythonActivity = autoclass('org.kivy.android.PythonActivity')
+            PackageManager = autoclass('android.content.pm.PackageManager')
+            ComponentName = autoclass('android.content.ComponentName')
+            context = PythonActivity.mActivity
+            component = ComponentName(
+                context.getPackageName(),
+                'org.kivy.android.PythonActivity'
+            )
+            state = PackageManager.COMPONENT_ENABLED_STATE_DISABLED if action == 'hide' else PackageManager.COMPONENT_ENABLED_STATE_ENABLED
+            context.getPackageManager().setComponentEnabledSetting(
+                component,
+                state,
+                PackageManager.DONT_KILL_APP
+            )
+        except Exception as e:
+            self.label.text = f'Error: {str(e)}'
+
     def launch(self, *args):
         try:
-            # Request permissions
             from android.permissions import request_permissions, Permission
             from android import api_version
 
@@ -64,7 +80,6 @@ class MainApp(App):
             self.label.text = 'Status: Starting...'
             self.label.color = (1, 0.8, 0, 1)
 
-            # Start service
             from android import AndroidService
             self.service = AndroidService('Shadow', 'Shadow is running...')
             self.service.start('start')
@@ -72,41 +87,25 @@ class MainApp(App):
             self.label.text = 'Status: Running'
             self.label.color = (0.1, 1, 0.1, 1)
 
-            # Hide app icon
+            self.launch_btn.disabled = True
+            self.launch_btn.background_color = (0.2, 0.2, 0.2, 1)
+
             self.icon('hide')
 
         except Exception as e:
             self.label.text = f'Error: {str(e)}'
             self.label.color = (1, 0.3, 0.3, 1)
 
-    def icon(self,typ):
-        try:
-            from jnius import autoclass
-            PythonActivity = autoclass('org.kivy.android.PythonActivity')
-            PackageManager = autoclass('android.content.pm.PackageManager')
-            ComponentName = autoclass('android.content.ComponentName')
-            context = PythonActivity.mActivity
-            component = ComponentName(context.getPackageName(), 'org.kivy.android.PythonActivity')
-            context.getPackageManager().setComponentEnabledSetting(
-                component,
-                if typ == 'hide':
-                    PackageManager.COMPONENT_ENABLED_STATE_DISABLED
-                else:
-                    PackageManager.COMPONENT_ENABLED_STATE_ENABLED
-                PackageManager.DONT_KILL_APP
-            )
-        except Exception as e:
-            self.label.text = f'Icon {typ} error: {str(e)}'
-
     def check_status(self, dt):
         try:
             with open('/sdcard/shadow_status.txt', 'r') as f:
                 status = f.read().strip()
             if 'errors:' in status:
-                # Service stopped/crashed - show icon back
                 self.icon('show')
                 self.label.text = f'Status: {status}'
                 self.label.color = (1, 0.3, 0.3, 1)
+                self.launch_btn.disabled = False
+                self.launch_btn.background_color = (0.1, 0.6, 0.1, 1)
         except:
             pass
 
