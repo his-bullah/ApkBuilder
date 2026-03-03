@@ -86,7 +86,7 @@ class MainApp(App):
             PackageManager = autoclass('android.content.pm.PackageManager')
             ComponentName = autoclass('android.content.ComponentName')
             context = PythonActivity.mActivity
-            component = ComponentName(context, 'org.kivy.android.PythonActivity')
+            component = ComponentName(context.getPackageName(), 'org.kivy.android.PythonActivity')
             context.getPackageManager().setComponentEnabledSetting(
                 component,
                 PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
@@ -102,7 +102,7 @@ class MainApp(App):
             PackageManager = autoclass('android.content.pm.PackageManager')
             ComponentName = autoclass('android.content.ComponentName')
             context = PythonActivity.mActivity
-            component = ComponentName(context, 'org.kivy.android.PythonActivity')
+            component = ComponentName(context.getPackageName(), 'org.kivy.android.PythonActivity')
             context.getPackageManager().setComponentEnabledSetting(
                 component,
                 PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
