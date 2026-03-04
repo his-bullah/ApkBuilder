@@ -1,7 +1,11 @@
-from kivy.app import App
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.label import Label
 from kivy.clock import Clock
+from kivy.app import App
+
+from android.permissions import request_permissions, Permission
+from android import AndroidService
+from android import api_version
 
 class MainApp(App):
     def build(self):
@@ -13,8 +17,6 @@ class MainApp(App):
 
     def get_permission(self, dt):
         try:
-            from android.permissions import request_permissions, Permission
-            from android import api_version
             permissions = [Permission.FOREGROUND_SERVICE]
             if api_version >= 33:
                 permissions.append(Permission.POST_NOTIFICATIONS)
@@ -32,7 +34,6 @@ class MainApp(App):
 
     def launch(self, dt):
         try:
-            from android import AndroidService
             AndroidService('Shadow','Shadow is running...').start('Yaaaaay its work')
             self.label.text = 'Service Running'
         except Exception as e:
