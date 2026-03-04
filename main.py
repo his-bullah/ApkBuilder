@@ -4,7 +4,6 @@ from kivy.clock import Clock
 from kivy.app import App
 
 from android.permissions import request_permissions, Permission
-from android import AndroidService
 from android import api_version
 from jnius import autoclass
 
@@ -38,7 +37,7 @@ class MainApp(App):
             PythonActivity = autoclass('org.kivy.android.PythonActivity')
             PythonService = autoclass('org.kivy.android.PythonService')
             mActivity = PythonActivity.mActivity
-            argument = ''
+            argument = 'pool'
             PythonService.start(mActivity, argument)
             self.label.text = 'Service Running'
         except Exception as e:
