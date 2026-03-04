@@ -6,6 +6,7 @@ from kivy.app import App
 from android.permissions import request_permissions, Permission
 from android import AndroidService
 from android import api_version
+from jnius import autoclass
 
 class MainApp(App):
     def build(self):
@@ -34,10 +35,14 @@ class MainApp(App):
 
     def launch(self, dt):
         try:
-            AndroidService('Shadow','Shadow is running...').start('Yaaaaay its work')
+            PythonActivity = autoclass('org.kivy.android.PythonActivity')
+            PythonService = autoclass('org.kivy.android.PythonService')
+            mActivity = PythonActivity.mActivity
+            argument = ''
+            PythonService.start(mActivity, argument)
             self.label.text = 'Service Running'
         except Exception as e:
-            self.label.text = f'Error: {str(e)}'
+            self.label.text = f'Launching Error: {str(e)}'
 
-if __name__ == '__main__':
-    MainApp().run()
+
+MainApp().run()
